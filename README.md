@@ -13,6 +13,7 @@ Flutter的Canvas API是绘制自定义图标的完美工具。这个API非常直
 在图标的x轴和y轴添加标签
 
 最终项目的目标是变成下面的效果，咱们先睹为快：
+
 ![final-app.gif](https://github.com/Wisdozzh/curve_line_demo/blob/main/images/final-app.gif?raw=true)
 
 实现细节请参考博客：[ Flutter 中的曲线图](https://juejin.cn/editor/drafts/7183938362561003576)
