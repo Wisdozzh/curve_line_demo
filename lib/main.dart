@@ -109,10 +109,13 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               height: chartHeight,
               color: const Color(0XFF158443),
               child: Stack(
-                children: const [
-                  Placeholder(
-                    color: Colors.white,
-                  )
+                children: [
+                  CustomPaint(
+                    size: Size(MediaQuery.of(context).size.width, chartHeight),
+                    painter: PathPainter(
+                      path: drawPath(),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -132,6 +135,16 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         ),
       ],
     );
+  }
+
+  Path drawPath() {
+    final width = MediaQuery.of(context).size.width;
+    final height = chartHeight;
+    final path = Path();
+    path.moveTo(0, height);
+    path.lineTo(width / 2, height * 0.5);
+    path.lineTo(width, height * 0.75);
+    return path;
   }
 }
 
@@ -155,4 +168,23 @@ class DashboardBackground extends StatelessWidget {
       ],
     );
   }
+}
+
+class PathPainter extends CustomPainter {
+  Path path;
+  PathPainter({required this.path});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // paint the line
+    final paint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4.0;
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+
 }
