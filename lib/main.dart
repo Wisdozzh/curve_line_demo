@@ -1,4 +1,5 @@
 
+import 'package:curve_line_demo/laughing_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -44,16 +45,32 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     initialPage: 3
   );
   double chartHeight = 240;
+  late List<ChartDataPoint> chartData;
 
   @override
   void initState() {
     super.initState();
+    setState(() {
+      chartData = normalizeData(weeksData[activeWeek - 1]);
+    });
+  }
+
+  List<ChartDataPoint> normalizeData(WeekData weekData) {
+    final maxDay = weekData.days.reduce((DayData dayA, DayData dayB) {
+      return dayA.laughs > dayB.laughs ? dayA : dayB;
+    });
+    final normalizedList = <ChartDataPoint>[];
+    for (var element in weekData.days) {
+      normalizedList.add(ChartDataPoint(value: maxDay.laughs == 0 ? 0 : element.laughs / maxDay.laughs));
+    }
+    return normalizedList;
   }
 
   void changeWeek(int week) {
     setState(() {
       activeWeek = week;
       summaryController.animateToPage(week, duration: const Duration(milliseconds: 300), curve: Curves.ease);
+      chartData = normalizeData(weeksData[activeWeek - 1]);
     });
   }
 
@@ -140,10 +157,14 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   Path drawPath() {
     final width = MediaQuery.of(context).size.width;
     final height = chartHeight;
+    final segmentWidth = width / (chartData.length - 1);
     final path = Path();
-    path.moveTo(0, height);
-    path.lineTo(width / 2, height * 0.5);
-    path.lineTo(width, height * 0.75);
+    path.moveTo(0, height - chartData[0].value * height);
+    for (var i = 0; i < chartData.length; ++i) {
+      final x = i * segmentWidth;
+      final y = height - (chartData[i].value * height);
+      path.lineTo(x, y);
+    }
     return path;
   }
 }
@@ -187,4 +208,10 @@ class PathPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 
+}
+
+class ChartDataPoint {
+  final double value;
+
+  ChartDataPoint({required this.value});
 }
