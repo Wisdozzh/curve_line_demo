@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 
 import 'package:curve_line_demo/laughing_data.dart';
 import 'package:flutter/material.dart';
@@ -130,7 +131,8 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                   CustomPaint(
                     size: Size(MediaQuery.of(context).size.width, chartHeight),
                     painter: PathPainter(
-                      path: drawPath(),
+                      path: drawPath(false),
+                      fillPath: drawPath(true)
                     ),
                   ),
                 ],
@@ -154,7 +156,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     );
   }
 
-  Path drawPath() {
+  Path drawPath(bool closePath) {
     final width = MediaQuery.of(context).size.width;
     final height = chartHeight;
     final segmentWidth = width / (chartData.length - 1);
@@ -164,6 +166,11 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
       final x = i * segmentWidth;
       final y = height - (chartData[i].value * height);
       path.lineTo(x, y);
+    }
+
+    if (closePath) {
+      path.lineTo(width, height);
+      path.lineTo(0, height);
     }
     return path;
   }
@@ -193,7 +200,8 @@ class DashboardBackground extends StatelessWidget {
 
 class PathPainter extends CustomPainter {
   Path path;
-  PathPainter({required this.path});
+  Path fillPath;
+  PathPainter({required this.path, required this.fillPath});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -203,6 +211,17 @@ class PathPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 4.0;
     canvas.drawPath(path, paint);
+    // paint the gradient fill
+    paint.style = PaintingStyle.fill;
+    paint.shader = ui.Gradient.linear(
+      Offset.zero,
+      Offset(0.0, size.height),
+      [
+        Colors.white.withOpacity(0.2),
+        Colors.white.withOpacity(1),
+      ]
+    );
+    canvas.drawPath(fillPath, paint);
   }
 
   @override
