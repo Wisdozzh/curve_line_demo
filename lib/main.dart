@@ -159,19 +159,11 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   Path drawPath(bool closePath) {
     final width = MediaQuery.of(context).size.width;
     final height = chartHeight;
-    final segmentWidth = width / (chartData.length - 1);
     final path = Path();
-    path.moveTo(0, height - chartData[0].value * height);
-    for (var i = 0; i < chartData.length; ++i) {
-      final x = i * segmentWidth;
-      final y = height - (chartData[i].value * height);
-      path.lineTo(x, y);
-    }
-
-    if (closePath) {
-      path.lineTo(width, height);
-      path.lineTo(0, height);
-    }
+    final segmentWidth = width / 3 / 2;
+    path.moveTo(0, height);
+    path.cubicTo(segmentWidth, height, 2 * segmentWidth, 0, 3 * segmentWidth, 0);
+    path.cubicTo(4 * segmentWidth, 0, 5 * segmentWidth, height, 6 * segmentWidth, height);
     return path;
   }
 }
