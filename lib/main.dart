@@ -41,6 +41,9 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMixin{
   int activeWeek = 3;
+  static const leftPadding = 60.0;
+  static const rightPadding = 60.0;
+
   PageController summaryController = PageController(
     viewportFraction: 1,
     initialPage: 3
@@ -160,7 +163,8 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     final width = MediaQuery.of(context).size.width;
     final height = chartHeight;
     final path = Path();
-    final segmentWidth = width / 3 / 2;
+    final segmentWidth =
+        (width - leftPadding - rightPadding) / ((chartData.length - 1) * 3);
     path.moveTo(0, height);
     path.cubicTo(segmentWidth, height, 2 * segmentWidth, 0, 3 * segmentWidth, 0);
     path.cubicTo(4 * segmentWidth, 0, 5 * segmentWidth, height, 6 * segmentWidth, height);
