@@ -132,6 +132,13 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
               color: const Color(0XFF158443),
               child: Stack(
                 children: [ // old code
+                  ChartLaughLabels(
+                      chartHeight: chartHeight,
+                      topPadding: 40,
+                      leftPadding: leftPadding,
+                      rightPadding: rightPadding,
+                      weekData: weeksData[activeWeek - 1],
+                  ),
                   const Positioned(
                       bottom: 0,
                       left: 0,
