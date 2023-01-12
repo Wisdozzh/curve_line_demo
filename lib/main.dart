@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:curve_line_demo/components/chart_labels.dart';
 import 'package:curve_line_demo/laughing_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -127,15 +128,26 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
             ),
             const SizedBox(height: 20,),
             Container(
-              height: chartHeight,
+              height: chartHeight + 80,
               color: const Color(0XFF158443),
               child: Stack(
-                children: [
-                  CustomPaint(
-                    size: Size(MediaQuery.of(context).size.width, chartHeight),
-                    painter: PathPainter(
-                      path: drawPath(false),
-                      fillPath: drawPath(true)
+                children: [ // old code
+                  const Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: ChartDayLabels(
+                        leftPadding: leftPadding,
+                        rightPadding: rightPadding,
+                      )
+                  ),
+                  Positioned(
+                    top: 40,
+                    child: CustomPaint(
+                      size:
+                          Size(MediaQuery.of(context).size.width, chartHeight),
+                      painter: PathPainter(
+                          path: drawPath(false), fillPath: drawPath(true)),
                     ),
                   ),
                 ],
@@ -165,9 +177,25 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
     final path = Path();
     final segmentWidth =
         (width - leftPadding - rightPadding) / ((chartData.length - 1) * 3);
-    path.moveTo(0, height);
-    path.cubicTo(segmentWidth, height, 2 * segmentWidth, 0, 3 * segmentWidth, 0);
-    path.cubicTo(4 * segmentWidth, 0, 5 * segmentWidth, height, 6 * segmentWidth, height);
+
+    path.moveTo(0, height - chartData[0].value * height);
+    path.lineTo(leftPadding, height - chartData[0].value * height);
+    // curved line
+    for (var i = 1; i < chartData.length; i++) {
+      path.cubicTo(
+          (3 * (i - 1) + 1) * segmentWidth + leftPadding,
+          height - chartData[i - 1].value * height,
+          (3 * (i - 1) + 2) * segmentWidth + leftPadding,
+          height - chartData[i].value * height,
+          (3 * (i - 1) + 3) * segmentWidth + leftPadding,
+          height - chartData[i].value * height);
+    }
+    path.lineTo(width, height - chartData[chartData.length - 1].value * height);
+    // for the gradient fill, we want to close the path
+    if (closePath) {
+      path.lineTo(width, height);
+      path.lineTo(0, height);
+    }
     return path;
   }
 }
@@ -214,7 +242,7 @@ class PathPainter extends CustomPainter {
       Offset(0.0, size.height),
       [
         Colors.white.withOpacity(0.2),
-        Colors.white.withOpacity(1),
+        Colors.white.withOpacity(0.85),
       ]
     );
     canvas.drawPath(fillPath, paint);
